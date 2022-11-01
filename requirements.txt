@@ -1,0 +1,4 @@
+typer[all]
+cmd2
+jinja2
+appdirs
