@@ -27,7 +27,8 @@ class M3uChannel:
     tvg_sources: list = field(default_factory=list)
     tvg_type: ChannelType = ChannelType.UNKNOWN
     fhs_selected: bool = False
-    fhs_info: str = ""
+    fhs_tags: set = field(default_factory=set)
+    fhs_dict: dict = field(default_factory=dict)
 
 
 def import_m3u_stream(input_str):

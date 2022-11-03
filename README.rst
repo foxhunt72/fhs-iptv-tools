@@ -11,6 +11,10 @@ Initial version, docs need to go, for now
 - run tasks from script
 - use interactive mode
 
+Thanks to:
+----------
+- https://github.com/cmcconomy/iptv-filter.git
+
 
 Usage
 -----
@@ -39,6 +43,8 @@ Installation
   or
   pip3 install fhs_iptv_tools
 
+  # install ffprobe
+
 
 Requirements
 ^^^^^^^^^^^^
@@ -46,6 +52,8 @@ Requirements
 - cmd2
 - jinja2
 - appdirs
+
+
 
 Compatibility
 -------------

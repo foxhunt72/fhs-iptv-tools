@@ -106,6 +106,35 @@ def task_check_tag(task, include_tags=None, exclude_tags=None):
     return True
 
 
+def loop_play_task(command_dict, task, *, include_tags=None, exclude_tags=None, funcdict):
+    """Handle a task that can loop.
+
+    Args:
+        command_dict: function info
+        task: task array
+        include_tags: list of tags to run
+        exclude_tags: list of tags to skip
+        funcdict: function dict
+
+    Returns:
+        Good: boolean
+    """
+    loop = command_dict.get('loop', None)
+    if type(task[loop]) != list:
+        print(f"loop variable {loop} in task but not a list.")
+        exit(1)
+    for i in task[loop]:
+        new_task = task.copy()
+        del new_task[loop]
+        for p in i:
+            new_task[p] = i[p]
+        play_task(new_task, include_tags=include_tags, exclude_tags=exclude_tags, funcdict=funcdict)
+    return True
+
+
+
+
+
 def play_task(task, *, include_tags=None, exclude_tags=None, funcdict):
     """Play a task.
 
@@ -113,6 +142,7 @@ def play_task(task, *, include_tags=None, exclude_tags=None, funcdict):
         task: task array
         include_tags: list of tags to run
         exclude_tags: list of tags to skip
+        funcdict: function dict
 
     Returns:
         Good: boolean
@@ -133,6 +163,11 @@ def play_task(task, *, include_tags=None, exclude_tags=None, funcdict):
     if command_dict is None:
         print("unknown task:  {task['command']}")
         pprint(task)
+        return True
+
+    loop = command_dict.get('loop', None)
+    if loop is not None and loop in task:
+        loop_play_task(command_dict, task, include_tags=include_tags, exclude_tags=exclude_tags, funcdict=funcdict)
         return True
 
     if check_arguments_in_task(task, command_dict) is False:
@@ -167,3 +202,25 @@ def play(commandfile, *, include_tags=None, exclude_tags=None, funcdict):
         play_task(task, include_tags=include_tags, exclude_tags=exclude_tags, funcdict=funcdict)
 
     return None
+
+
+def func_dict_parse(funcdict, for_type=None):
+    """Parse func dict dict.
+
+    Args:
+        funcdict: dict with all the commands
+        for_type: interactive or None at this moment.
+
+    Returns:
+        funcdict: parsed
+    """
+    new_funcdict = dict()
+    for p in funcdict:
+        cur_func = funcdict[p]
+        if cur_func.get('hidden', False) == True:
+            continue
+        if for_type == 'interactive' and cur_func.get('interactive_hidden', False) == True:
+            continue
+        new_funcdict[p] = cur_func
+    return new_funcdict
+

@@ -3,7 +3,7 @@
 
 import sys
 from . import config
-from .playyaml_lib import play as play_lib
+from .playyaml_lib import func_dict_parse, play as play_lib
 
 
 def play_command_load_m3u_file(task):
@@ -42,6 +42,91 @@ def play_command_count_channels(task):
         config.STORE[task_store] = ProbeInfoList()
     count = config.STORE[task_store].count_channels()
     print(f"amount of channels: {count}")
+    return True
+
+
+def play_command_dump_channels(task):
+    """Play command dump channels.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList, LoadType
+    from pprint import pprint
+
+    task_store = task['store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    channels = config.STORE[task_store].filter_lijst(LoadType.ALL)
+    pprint(channels)
+    return True
+
+
+def play_command_delete_channels(task):
+    """Play command delete channels.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList, LoadType
+
+    task_store = task['store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    count = config.STORE[task_store].delete_channels(with_tag=task['with_tag'], without_tag=task['without_tag'])
+    print(f"removed {count} channels.")
+    return True
+
+
+def play_command_select(task):
+    """Play command select.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    count = config.STORE[task_store].select(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        tvg_group_title=task['group_title'],
+        tvg_name=task['name'],
+        tvg_id=task['id'],
+        tvg_source=task['source'],
+        set_tag=task['set_tag'],
+        clear_tag=task['clear_tag'])
+    print(f"selected {count} channels.")
+    return True
+
+
+def play_command_add_channel(task):
+    """Play command add channel.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    config.STORE[task_store].add_channel(tvg_id=task['id'], tvg_name=task['name'], tvg_logo=task['logo_url'], tvg_group_title=task['group_title'], tvg_source=task['source'])
+    print(f"add channel: {task['id']} / {task['name']}")
     return True
 
 
@@ -143,6 +228,11 @@ funcdict = {
         "func": play_command_count_channels,
         "help": "count amount of channels in m3u list."
     },
+    "dump_channels": {
+        "args": [{"name": "store", "help": "store name", "default": "default"}],
+        "func": play_command_dump_channels,
+        "help": "dump channels using pprint."
+    },
     "list_groups": {
         "args": [{"name": "store", "help": "store name", "default": "default"}],
         "func": play_command_list_groups,
@@ -162,6 +252,43 @@ funcdict = {
         "args": [{"name": 'type', "help": "type to filter, channels or vod"}, {"name": "store", "help": "store name", "default": "default"}],
         "func": play_command_filter_channels,
         "help": "filter channels."
+    },
+    "add_channel": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "id"},
+            {"name": "name"},
+            {"name": "logo_url", "default": ""},
+            {"name": "group_title"},
+            {"name": "source"}
+        ],
+        "func": play_command_add_channel,
+        "loop": "channels",
+        "help": "add channel."
+    },
+    "delete_channels": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+        ],
+        "func": play_command_delete_channels,
+        "help": "delete channels."
+    },
+    "select": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+            {"name": "group_title", "default": ""},
+            {"name": "name", "default": ""},
+            {"name": "id", "default": ""},
+            {"name": "source", "default": ""},
+            {"name": "set_tag", "default": ""},
+            {"name": "clear_tag", "default": ""}
+        ],
+        "func": play_command_select,
+        "help": "select channels."
     }
 }
 
@@ -177,7 +304,7 @@ def play(commandfile, include_tags=None, exclude_tags=None):
     Returns:
         None
     """
-    play_lib(commandfile, include_tags=include_tags, exclude_tags=exclude_tags, funcdict=funcdict)
+    play_lib(commandfile, include_tags=include_tags, exclude_tags=exclude_tags, funcdict=func_dict_parse(funcdict))
 
     return None
 
@@ -188,4 +315,4 @@ def interactive_run_cmd2():
     """
     from .interactive_cmd2 import run_cmd2
 
-    run_cmd2(funcdict=funcdict)
+    run_cmd2(funcdict=func_dict_parse(funcdict, for_type="interactive"))

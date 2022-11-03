@@ -14,3 +14,4 @@ Shortlist to come:
 
 --------------------------------------------------------------
 - 0.8.0: initial creation
+- 0.8.1: add select, delete_channels, add_channel

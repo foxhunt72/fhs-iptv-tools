@@ -1,7 +1,7 @@
 # probe source
 
 from .probe import ProbeInfo
-from .import_m3u import import_m3u_file, return_tvg_group_titles
+from .import_m3u import import_m3u_file, return_tvg_group_titles, M3uChannel
 from enum import Enum
 import time
 
@@ -140,3 +140,99 @@ class ProbeInfoList:
             if ch.tvg_group_title == group:
                 channels.append(ch)
         return channels
+
+    def add_channel(self, *, tvg_id, tvg_name, tvg_logo, tvg_group_title, tvg_source):
+        """List the channels in a group.
+
+        Args:
+            group: show vod only
+
+        Returns:
+            list of channels
+        """
+        self.__m3u_channels.append(M3uChannel(tvg_id=tvg_id, tvg_name=tvg_name.strip(), tvg_logo=tvg_logo, tvg_group_title=tvg_group_title))
+        self.__m3u_channels[-1].tvg_sources.append(tvg_source)
+
+    def select(self, *, with_tag="", without_tag="", tvg_group_title="", tvg_name="", tvg_id="", tvg_source="", set_tag="", clear_tag=""):
+        """Select channel.
+
+        If multiple filters are used than it is a 'AND'
+
+        Args:
+            with_tag: select on tag set
+            without_tag: select on tag not set
+            tvg_id: select based on tvg_id
+            tvg_group_title: select in group_title
+            tvg_name: select in tvg_name
+            tvg_source: select on source url
+            set_tag: set tag
+            clear_tag: remove tag
+
+        Returns:
+            count, amount of
+        """
+        from .utils import check_search_filter_in_string
+
+        if set_tag == "" and clear_tag == "":
+            self.write_error("ERROR: select needs to set a tag or remove a tag.")
+            return -1
+
+        count = 0
+        for ch in self.__m3u_channels:
+            # check if tag is precent
+            if with_tag != "" and with_tag not in ch.fhs_tags:
+                continue
+
+            # check if tag is not precent
+            if without_tag != "" and without_tag in ch.fhs_tags:
+                continue
+
+            if tvg_id != "" and check_search_filter_in_string(ch.tvg_id, tvg_id) is False:
+                continue
+
+            if tvg_group_title != "" and check_search_filter_in_string(ch.tvg_group_title, tvg_group_title) is False:
+                continue
+
+            if tvg_name != "" and check_search_filter_in_string(ch.tvg_name, tvg_name) is False:
+                continue
+
+            if tvg_source != "":
+                self.write_error(f"ERROR: tvg_source not implemented: {tvg_source}.")
+            count += 1
+            if set_tag != "":
+                ch.fhs_tags.add(set_tag)
+            if clear_tag != "":
+                try:
+                    ch.fhs_tags.remove(set_tag)
+                except KeyError:
+                    pass
+        return count
+
+    def delete_channels(self, *, with_tag="", without_tag=""):
+        """Delete channels.
+
+        Delete channels
+
+        Args:
+            with_tag: select on tag set
+            without_tag: select on tag not set
+
+        Returns:
+            count, amount of
+        """
+
+        if with_tag == "" and without_tag == "":
+            self.write_error("delete_channel needs with_tag or without_tag set.")
+            return -1
+
+        count = 0
+        for p in range(len(self.__m3u_channels), 0, -1):
+            if with_tag != "" and with_tag in self.__m3u_channels[p - 1].fhs_tags:
+                del self.__m3u_channels[p - 1]
+                count += 1
+                continue
+            if without_tag != "" and without_tag not in self.__m3u_channels[p - 1].fhs_tags:
+                del self.__m3u_channels[p - 1]
+                count += 1
+                continue
+        return count
