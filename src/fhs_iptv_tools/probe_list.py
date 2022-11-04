@@ -238,7 +238,7 @@ class ProbeInfoList:
                 continue
         return count
 
-    def get_channels(self, *, with_tag="", without_tag=""):
+    def get_channels(self, *, with_tag="", without_tag="", with_id=""):
         """Get channels.
 
         Get channels
@@ -252,6 +252,8 @@ class ProbeInfoList:
         """
 
         for ch in self.__m3u_channels:
+            if with_id != "" and ch.tvg_id != with_id:
+                continue
             if with_tag != "" and with_tag not in ch.fhs_tags:
                 continue
             if without_tag != "" and without_tag in ch.fhs_tags:
@@ -268,7 +270,9 @@ class ProbeInfoList:
         tags = ", ".join(channel.fhs_tags)
         if tags != "":
             display_tags = f" tags: {tags}"
-        return f"{channel.tvg_name}   /   {channel.tvg_group_title}{display_tags}"
+        else:
+            display_tags = ""
+        return f"<{channel.tvg_id}> {channel.tvg_name}   /   {channel.tvg_group_title}{display_tags}"
 
     def list_channels(self, *, with_tag="", without_tag=""):
         """List channels.
@@ -305,3 +309,40 @@ class ProbeInfoList:
         if export_m3u_file(file, channels) is False:
             print(f"save failed to file: {file}.")
         print(f"channels saved to m3u file {file}")
+
+    def modify_channels(self, *, with_tag="", without_tag="", with_id="", set_id="", set_name="", set_group_title="", set_logo=""):
+        """Modify channel.
+
+        Args:
+            with_tag: select on tag set
+            without_tag: select on tag not set
+            with_id: change only on id
+            set_id: set new id
+            set_name: set_name
+            set_group_title: set group title
+            set_logo: set logo
+
+        Returns:
+            count: channels changed.
+        """
+        channels = self.get_channels(with_tag=with_tag, without_tag=without_tag, with_id=with_id)
+        if set_id != "" or set_name != "" or set_logo != "":
+            # this modifications we do only on one channel at a time.
+            channels = list(channels)
+            if len(channels) != 1:
+                self.write_error(f"ERROR: you can only change this type one channel on a time and not for {len(channels)}")
+                return -1
+        count = 0
+        for ch in channels:
+            count += 1
+            if set_id != "":
+                ch.tvg_id = set_id
+            if set_name != "":
+                ch.tvg_name = set_name
+            if set_group_title != "":
+                ch.tvg_group_title = set_group_title
+            if set_logo != "":
+                ch.tvg_logo = set_logo
+        return count
+
+

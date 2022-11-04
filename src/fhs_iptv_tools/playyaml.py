@@ -122,6 +122,35 @@ def play_command_list_channels(task):
     print(f"list {count} channels.")
     return True
 
+
+def play_command_modify_channels(task):
+    """Play command modify channels.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    count = config.STORE[task_store].modify_channels(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        with_id=task['with_id'],
+        set_id=task['set_id'],
+        set_name=task['set_name'],
+        set_group_title=task['set_group_title'],
+        set_logo=task['set_logo'],
+    )
+
+    print(f"modified {count} channels.")
+    return True
+
+
 def play_command_select(task):
     """Play command select.
 
@@ -312,6 +341,21 @@ funcdict = {
         ],
         "func": play_command_delete_channels,
         "help": "delete channels."
+    },
+    "modify_channels": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+            {"name": "with_id", "default": ""},
+            {"name": "set_id", "default": ""},
+            {"name": "set_name", "default": ""},
+            {"name": "set_group_title", "default": ""},
+            {"name": "set_logo", "default": ""},
+        ],
+        "func": play_command_modify_channels,
+        "loop": "channels",
+        "help": "modify channels."
     },
     "list_channels": {
         "args": [
