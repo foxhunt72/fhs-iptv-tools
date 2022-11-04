@@ -206,6 +206,7 @@ class ProbeInfoList:
                     ch.fhs_tags.remove(set_tag)
                 except KeyError:
                     pass
+            print(f"{count}: {ch.tvg_name}     /   {ch.tvg_group_title}")
         return count
 
     def delete_channels(self, *, with_tag="", without_tag=""):
@@ -236,3 +237,71 @@ class ProbeInfoList:
                 count += 1
                 continue
         return count
+
+    def get_channels(self, *, with_tag="", without_tag=""):
+        """Get channels.
+
+        Get channels
+
+        Args:
+            with_tag: select on tag set
+            without_tag: select on tag not set
+
+        Returns:
+            yield of channels
+        """
+
+        for ch in self.__m3u_channels:
+            if with_tag != "" and with_tag not in ch.fhs_tags:
+                continue
+            if without_tag != "" and without_tag in ch.fhs_tags:
+                continue
+            yield ch
+
+    def display_channel(self, channel, *, extra=None):
+        """Display channel.
+
+        Args:
+            channel: m3uchannel to display
+            extra: what extra info to show, future use
+        """
+        tags = ", ".join(channel.fhs_tags)
+        if tags != "":
+            display_tags = f" tags: {tags}"
+        return f"{channel.tvg_name}   /   {channel.tvg_group_title}{display_tags}"
+
+    def list_channels(self, *, with_tag="", without_tag=""):
+        """List channels.
+
+        List channels
+
+        Args:
+            with_tag: select on tag set
+            without_tag: select on tag not set
+
+        Returns:
+            yield of channels
+        """
+
+        count = 0
+        for ch in self.get_channels(with_tag=with_tag, without_tag=without_tag):
+            count += 1
+            print(f"{count}: {self.display_channel(ch)}")
+        return count
+
+    def save_m3u_file(self, *, file, with_tag="", without_tag=""):
+        """List channels.
+
+        List channels
+
+        Args:
+            file: filename to save
+            with_tag: select on tag set
+            without_tag: select on tag not set
+        """
+        from .import_m3u import export_m3u_file
+
+        channels = self.get_channels(with_tag=with_tag, without_tag=without_tag)
+        if export_m3u_file(file, channels) is False:
+            print(f"save failed to file: {file}.")
+        print(f"channels saved to m3u file {file}")

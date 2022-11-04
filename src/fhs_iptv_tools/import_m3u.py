@@ -82,6 +82,32 @@ def import_m3u_file(m3u_file):
     return None
 
 
+def export_m3u_file(m3u_file, m3u_channels):
+    """Export to m3u file from channels.
+
+    Args:
+        m3u_file: path to m3u file to write
+        m3u_channels: channels to save to file.
+
+    Returns:
+        Result
+    """
+    try:
+        with open(m3u_file, "w") as output_stream:
+            print("#EXTM3U", file=output_stream)
+            for ch in m3u_channels:
+                print(f'#EXTINF:-1 tvg-id="{ch.tvg_id}" tvg-name="{ch.tvg_name}" tvg-logo="{ch.tvg_logo}" group-title="{ch.tvg_group_title}",{ch.tvg_name}', file=output_stream)  # noqa: E501
+                for source in ch.tvg_sources:
+                    print(source, file=output_stream)
+    except PermissionError:
+        print('ERROR: no permission.')
+        return False
+    except OSError as e:
+        print(f"ERROR: oserror {e}")
+        return False
+    return True
+
+
 def return_tvg_group_titles(m3u_channels, vod_only=False):
     """Extract group titles from m3u_channgels.
 

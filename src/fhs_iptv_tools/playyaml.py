@@ -26,6 +26,26 @@ def play_command_load_m3u_file(task):
     return True
 
 
+def play_command_save_m3u_file(task):
+    """Play command save_m3u_file.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task["store"]
+    task_file = task["file"]
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    with config.CONSOLE.status(f"Loading m3u file: {task_file}  to store: {task_store}", spinner="dots"):
+        config.STORE[task_store].save_m3u_file(file=task_file, with_tag=task['with_tag'], without_tag=task['without_tag'])
+    return True
+
+
 def play_command_count_channels(task):
     """Play command count channels.
 
@@ -83,6 +103,24 @@ def play_command_delete_channels(task):
     print(f"removed {count} channels.")
     return True
 
+
+def play_command_list_channels(task):
+    """Play command list channels.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    count = config.STORE[task_store].list_channels(with_tag=task['with_tag'], without_tag=task['without_tag'])
+    print(f"list {count} channels.")
+    return True
 
 def play_command_select(task):
     """Play command select.
@@ -274,6 +312,25 @@ funcdict = {
         ],
         "func": play_command_delete_channels,
         "help": "delete channels."
+    },
+    "list_channels": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+        ],
+        "func": play_command_list_channels,
+        "help": "list channels."
+    },
+    "save_m3u": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "file"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+        ],
+        "func": play_command_save_m3u_file,
+        "help": "save channels."
     },
     "select": {
         "args": [

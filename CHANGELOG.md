@@ -6,12 +6,14 @@ fhs-iptv-tools
 
 Shortlist to come:
 ------------------
-- searching channels
-- selecting channels
-- probe selected channels
-- save selected to new file
-- and lots more
+
+- modify channel id, name, group title, etc
+- copy to new store (append multiple files this way)
+- sort
+- download m3u file from url
+- and lots more (just request on github)
 
 --------------------------------------------------------------
 - 0.8.0: initial creation
 - 0.8.1: add select, delete_channels, add_channel
+- 0.8.2: add save_m3u (so now this program is usable)
