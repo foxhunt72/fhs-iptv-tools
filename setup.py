@@ -31,13 +31,13 @@ setup(
     author="Richard de Vos",
     author_email="rdevos72@gmail.com",
     description="foxhunt software iptv tools, making iptv easier",
-    long_description=read("README.rst"),
+    long_description=read("README.md"),
+    long_description_content_type='text/markdown',
     entry_points={
         "console_scripts": [
             "fhs-iptv-tools=fhs_iptv_tools.cli:main",
         ],
     },
-
     packages=find_packages(
         where="src",
         exclude=(

@@ -142,16 +142,33 @@ class ProbeInfoList:
         return channels
 
     def add_channel(self, *, tvg_id, tvg_name, tvg_logo, tvg_group_title, tvg_source):
-        """List the channels in a group.
+        """Add channel.
 
         Args:
-            group: show vod only
+            tvg_id: channel id
+            tvg_name: channel name
+            tvg_logo: url to channel logo
+            tvg_group_title: channel group
+            tvg_source: channel source
 
         Returns:
             list of channels
         """
         self.__m3u_channels.append(M3uChannel(tvg_id=tvg_id, tvg_name=tvg_name.strip(), tvg_logo=tvg_logo, tvg_group_title=tvg_group_title))
         self.__m3u_channels[-1].tvg_sources.append(tvg_source)
+        return self.__m3u_channels
+
+    def add_channel_struct(self, channel):
+        """Add channel by struct.
+
+        Args:
+            channel: channel struct to add
+
+        Returns:
+            list of channels
+        """
+        self.__m3u_channels.append(channel)
+        return self.__m3u_channels
 
     def select(self, *, with_tag="", without_tag="", tvg_group_title="", tvg_name="", tvg_id="", tvg_source="", set_tag="", clear_tag=""):
         """Select channel.
@@ -238,7 +255,7 @@ class ProbeInfoList:
                 continue
         return count
 
-    def get_channels(self, *, with_tag="", without_tag="", with_id=""):
+    def get_channels(self, *, with_tag="", without_tag="", with_id="", with_name=""):
         """Get channels.
 
         Get channels
@@ -253,6 +270,8 @@ class ProbeInfoList:
 
         for ch in self.__m3u_channels:
             if with_id != "" and ch.tvg_id != with_id:
+                continue
+            if with_name != "" and ch.tvg_name != with_name:
                 continue
             if with_tag != "" and with_tag not in ch.fhs_tags:
                 continue
@@ -343,6 +362,27 @@ class ProbeInfoList:
                 ch.tvg_group_title = set_group_title
             if set_logo != "":
                 ch.tvg_logo = set_logo
+        return count
+
+    def copy_channels(self, *, with_tag="", without_tag="", with_id="", with_name="", to_store):
+        """Copy channel to store.
+
+        Args:
+            with_tag: select on tag set
+            without_tag: select on tag not set
+            with_id: change only on id
+            with_name: change only when name is the same
+            to_store: store to copy to
+
+        Returns:
+            count: channels changed.
+        """
+        channels = self.get_channels(with_tag=with_tag, without_tag=without_tag, with_id=with_id, with_name=with_name)
+        count = 0
+        for ch in channels:
+            count += 1
+            to_store.add_channel_struct(ch)
+            print(f"copied {ch.tvg_name}")
         return count
 
 

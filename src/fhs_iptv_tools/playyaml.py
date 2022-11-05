@@ -151,6 +151,35 @@ def play_command_modify_channels(task):
     return True
 
 
+def play_command_copy_channels(task):
+    """Play command copy channels.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    to_store = task['to_store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    if to_store not in config.STORE:
+        config.STORE[to_store] = ProbeInfoList()
+    count = config.STORE[task_store].copy_channels(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        with_id=task['with_id'],
+        with_name=task['with_name'],
+        to_store=config.STORE[to_store]
+    )
+
+    print(f"copy {count} channels.")
+    return True
+
+
 def play_command_select(task):
     """Play command select.
 
@@ -237,6 +266,25 @@ def play_command_list_groups(task):
     return True
 
 
+def play_command_list_stores(task):
+    """Play command list groups.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    for i in config.STORE:
+        my_store=config.STORE[i]
+        count=my_store.count_channels()
+        groups = my_store.list_groups()
+        print(f"{i}: {count} channels, {len(groups)} groups.")
+    return True
+
+
 def play_command_group_channels(task):
     """Play command group channels.
 
@@ -305,6 +353,11 @@ funcdict = {
         "func": play_command_list_groups,
         "help": "list groups."
     },
+    "list_stores": {
+        "args": [],
+        "func": play_command_list_stores,
+        "help": "list stores."
+    },
     "group_channels": {
         "args": [{"name": "store", "help": "store name", "default": "default"},{"name": "group"}],
         "func": play_command_group_channels,
@@ -356,6 +409,19 @@ funcdict = {
         "func": play_command_modify_channels,
         "loop": "channels",
         "help": "modify channels."
+    },
+    "copy_channels": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+            {"name": "with_id", "default": ""},
+            {"name": "with_name", "default": ""},
+            {"name": "to_store", "default": ""},
+        ],
+        "func": play_command_copy_channels,
+        "loop": "channels",
+        "help": "copy channels to other store (create store if not exists)."
     },
     "list_channels": {
         "args": [

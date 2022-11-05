@@ -7,7 +7,6 @@ fhs-iptv-tools
 Shortlist to come:
 ------------------
 
-- copy to new store (append multiple files this way)
 - sort
 - download m3u file from url
 - and lots more (just request on github)
@@ -17,3 +16,4 @@ Shortlist to come:
 - 0.8.1: add select, delete_channels, add_channel
 - 0.8.2: add save_m3u (so now this program is usable)
 - 0.8.3: add modify_channel, change channel id, name, group_title, and logo and small bug in display channel
+- 0.8.4: add copy_channels to copy channels and list_stores to list current stores.
