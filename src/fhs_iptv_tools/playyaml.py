@@ -65,6 +65,32 @@ def play_command_count_channels(task):
     return True
 
 
+def play_command_clear_tag(task):
+    """Play command clear tag.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    all_stores = task['all_stores']
+    tag = task['tag']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    if all_stores != "":
+        count = 0
+        for store in config.STORE:
+            count += config.STORE[store].clear_tag(tag=tag)
+    else:
+        count = config.STORE[task_store].clear_tag(tag=tag)
+    print(f"cleared tag of channels: {count}")
+    return True
+
+
 def play_command_dump_channels(task):
     """Play command dump channels.
 
@@ -94,12 +120,17 @@ def play_command_delete_channels(task):
     Returns:
         Good: boolean
     """
-    from .probe_list import ProbeInfoList, LoadType
+    from .probe_list import ProbeInfoList
 
     task_store = task['store']
     if task_store not in config.STORE:
         config.STORE[task_store] = ProbeInfoList()
-    count = config.STORE[task_store].delete_channels(with_tag=task['with_tag'], without_tag=task['without_tag'])
+    count = config.STORE[task_store].delete_channels(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        with_id=task['with_id'],
+        with_name=task['with_name']
+    )
     print(f"removed {count} channels.")
     return True
 
@@ -386,13 +417,25 @@ funcdict = {
         "loop": "channels",
         "help": "add channel."
     },
+    "clear_tag": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "tag"},
+            {"name": "all_stores", "default": "", "help": "set with any value to remove tags from every store."}
+        ],
+        "func": play_command_clear_tag,
+        "help": "clear tag from every channel in store (or all stores)."
+    },
     "delete_channels": {
         "args": [
             {"name": "store", "help": "store name", "default": "default"},
             {"name": "with_tag", "default": ""},
             {"name": "without_tag", "default": ""},
+            {"name": "with_id", "default": ""},
+            {"name": "with_name", "default": ""},
         ],
         "func": play_command_delete_channels,
+        "loop": "channels",
         "help": "delete channels."
     },
     "modify_channels": {
@@ -422,6 +465,15 @@ funcdict = {
         "func": play_command_copy_channels,
         "loop": "channels",
         "help": "copy channels to other store (create store if not exists)."
+    },
+    "move_channels": {
+        "join": [
+            {"task": "copy_channels"},
+            {"task": "delete_channels"},
+        ],
+        "help": "move channels to other store.",
+        "hidden": True,
+        "loop": "channels."
     },
     "list_channels": {
         "args": [

@@ -2,6 +2,7 @@ import textwrap
 from jinja2 import Template
 import sys
 import cmd2
+import os
 import yaml
 from pathlib import Path
 
@@ -9,12 +10,13 @@ from .playyaml_lib import play_task
 from .__version__ import __app_name__,__version__
 
 
-def save_tasks(filename, taskdict):
+def save_tasks(filename, taskdict, funcdict):
     """Save tasks to file.
 
     Args:
         filename: save filename
         taskdict: save dict to task
+        funcdict: funcdict we are going to use to remove the default args from tasks
     """
     with Path(filename).open("w") as target:
         yaml.dump({'tasks': taskdict}, target)
@@ -59,7 +61,7 @@ def create_cmd2_class_str(my_dict):
 
         @cmd2.with_argparser(save_tasks_parser)
         def do_save_tasks(self, args):
-            save_tasks(args.file, self.__tasks)
+            save_tasks(args.file, self.__tasks, self.__funcdict)
 
 
         {% for key, my_func in my_dict.items() %}
@@ -99,6 +101,7 @@ def create_cmd2_class_str(my_dict):
 def run_cmd2(funcdict):
     test_str = create_cmd2_class_str(funcdict)
     #print(test_str)
+    hist_file = os.path.expanduser(f"~/.{__app_name__}.history")
     exec(test_str, None, globals())
-    c = CmdLineApp(funcdict, f"/tmp/.{__app_name__}.hist", prompt=f"({__app_name__}) ") # cmdline
+    c = CmdLineApp(funcdict, hist_file, prompt=f"({__app_name__}) ") # cmdline
     sys.exit(c.cmdloop())

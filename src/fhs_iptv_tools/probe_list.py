@@ -4,6 +4,7 @@ from .probe import ProbeInfo
 from .import_m3u import import_m3u_file, return_tvg_group_titles, M3uChannel
 from enum import Enum
 import time
+import copy
 
 
 class LoadType(Enum):
@@ -226,7 +227,7 @@ class ProbeInfoList:
             print(f"{count}: {ch.tvg_name}     /   {ch.tvg_group_title}")
         return count
 
-    def delete_channels(self, *, with_tag="", without_tag=""):
+    def delete_channels(self, *, with_tag="", without_tag="", with_id="", with_name=""):
         """Delete channels.
 
         Delete channels
@@ -239,8 +240,8 @@ class ProbeInfoList:
             count, amount of
         """
 
-        if with_tag == "" and without_tag == "":
-            self.write_error("delete_channel needs with_tag or without_tag set.")
+        if with_tag == "" and without_tag == "" and with_id == "" and with_name == "":
+            self.write_error("delete_channel needs with_tag, without_tag, with_id or with_name set.")
             return -1
 
         count = 0
@@ -250,6 +251,14 @@ class ProbeInfoList:
                 count += 1
                 continue
             if without_tag != "" and without_tag not in self.__m3u_channels[p - 1].fhs_tags:
+                del self.__m3u_channels[p - 1]
+                count += 1
+                continue
+            if with_id != "" and with_id==self.__m3u_channels[p - 1].tvg_id:
+                del self.__m3u_channels[p - 1]
+                count += 1
+                continue
+            if with_name != "" and with_name==self.__m3u_channels[p - 1].tvg_name:
                 del self.__m3u_channels[p - 1]
                 count += 1
                 continue
@@ -263,6 +272,8 @@ class ProbeInfoList:
         Args:
             with_tag: select on tag set
             without_tag: select on tag not set
+            with_id: select on id
+            with_name: select on name
 
         Returns:
             yield of channels
@@ -279,12 +290,33 @@ class ProbeInfoList:
                 continue
             yield ch
 
+    def clear_tag(self, *, tag):
+        """Clear tag.
+
+        Args:
+            tag: tag to clear
+
+        Returns:
+            count: amount of tags removed
+        """
+        count = 0
+        for ch in self.__m3u_channels:
+            try:
+                ch.fhs_tags.remove(tag)
+                count += 1
+            except KeyError:
+                pass
+        return count
+
     def display_channel(self, channel, *, extra=None):
         """Display channel.
 
         Args:
             channel: m3uchannel to display
             extra: what extra info to show, future use
+
+        Returns:
+            str:channel descriptions as string
         """
         tags = ", ".join(channel.fhs_tags)
         if tags != "":
@@ -381,7 +413,8 @@ class ProbeInfoList:
         count = 0
         for ch in channels:
             count += 1
-            to_store.add_channel_struct(ch)
+            # create a copy of the structure with copy.copy
+            to_store.add_channel_struct(copy.copy(ch))
             print(f"copied {ch.tvg_name}")
         return count
 

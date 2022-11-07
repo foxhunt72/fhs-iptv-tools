@@ -17,3 +17,4 @@ Shortlist to come:
 - 0.8.2: add save_m3u (so now this program is usable)
 - 0.8.3: add modify_channel, change channel id, name, group_title, and logo and small bug in display channel
 - 0.8.4: add copy_channels to copy channels and list_stores to list current stores.
+- 0.8.5: fix missing dependancy (pyyaml), add clear tag and change add copy of dataclass struct on copy_channel function
