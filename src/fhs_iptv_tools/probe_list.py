@@ -171,7 +171,7 @@ class ProbeInfoList:
         self.__m3u_channels.append(channel)
         return self.__m3u_channels
 
-    def select(self, *, with_tag="", without_tag="", tvg_group_title="", tvg_name="", tvg_id="", tvg_source="", set_tag="", clear_tag=""):
+    def select(self, *, with_tag="", without_tag="", tvg_group_title="", tvg_name="", tvg_id="", tvg_source="", set_tag="", clear_tag="", quiet=False):
         """Select channel.
 
         If multiple filters are used than it is a 'AND'
@@ -224,7 +224,8 @@ class ProbeInfoList:
                     ch.fhs_tags.remove(set_tag)
                 except KeyError:
                     pass
-            print(f"{count}: {ch.tvg_name}     /   {ch.tvg_group_title}")
+            if quiet is False:
+                print(f"{count}: {ch.tvg_name}     /   {ch.tvg_group_title}")
         return count
 
     def delete_channels(self, *, with_tag="", without_tag="", with_id="", with_name=""):

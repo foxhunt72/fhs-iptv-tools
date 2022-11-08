@@ -132,9 +132,6 @@ def loop_play_task(command_dict, task, *, include_tags=None, exclude_tags=None, 
     return True
 
 
-
-
-
 def play_task(task, *, include_tags=None, exclude_tags=None, funcdict):
     """Play a task.
 
@@ -159,7 +156,7 @@ def play_task(task, *, include_tags=None, exclude_tags=None, funcdict):
         sys.stderr.write(f"missing command entry in task {str(task)}")
         exit(3)
 
-    command_dict=funcdict.get(task["command"], None)
+    command_dict = funcdict.get(task["command"], None)
     if command_dict is None:
         print("unknown task:  {task['command']}")
         pprint(task)
@@ -217,10 +214,9 @@ def func_dict_parse(funcdict, for_type=None):
     new_funcdict = dict()
     for p in funcdict:
         cur_func = funcdict[p]
-        if cur_func.get('hidden', False) == True:
+        if cur_func.get('hidden', False) is True:
             continue
-        if for_type == 'interactive' and cur_func.get('interactive_hidden', False) == True:
+        if for_type == 'interactive' and cur_func.get('interactive_hidden', False) is True:
             continue
         new_funcdict[p] = cur_func
     return new_funcdict
-

@@ -65,7 +65,7 @@ def play_command_count_channels(task):
     return True
 
 
-def play_command_clear_tag(task):
+def play_command_clear_tag(task, quiet=False):
     """Play command clear tag.
 
     Args:
@@ -87,7 +87,8 @@ def play_command_clear_tag(task):
             count += config.STORE[store].clear_tag(tag=tag)
     else:
         count = config.STORE[task_store].clear_tag(tag=tag)
-    print(f"cleared tag of channels: {count}")
+    if quiet is False:
+        print(f"cleared tag of channels: {count}")
     return True
 
 
@@ -211,6 +212,41 @@ def play_command_copy_channels(task):
     return True
 
 
+def play_command_move_channels(task):
+    """Play command move channels.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    to_store = task['to_store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    if to_store not in config.STORE:
+        config.STORE[to_store] = ProbeInfoList()
+    count = config.STORE[task_store].copy_channels(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        with_id=task['with_id'],
+        with_name=task['with_name'],
+        to_store=config.STORE[to_store]
+    )
+
+    config.STORE[task_store].delete_channels(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        with_id=task['with_id'],
+        with_name=task['with_name']
+    )
+    print(f"moved {count} channels.")
+    return True
+
+
 def play_command_select(task):
     """Play command select.
 
@@ -235,6 +271,85 @@ def play_command_select(task):
         set_tag=task['set_tag'],
         clear_tag=task['clear_tag'])
     print(f"selected {count} channels.")
+    return True
+
+
+def play_command_select_copy(task):
+    """Play command select and copy.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    temp_tag = 'select_copy_tmp'
+    task_store = task['store']
+    to_store = task['to_store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    if to_store not in config.STORE:
+        config.STORE[to_store] = ProbeInfoList()
+    count = config.STORE[task_store].select(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        tvg_group_title=task['group_title'],
+        tvg_name=task['name'],
+        tvg_id=task['id'],
+        tvg_source=task['source'],
+        set_tag=temp_tag, quiet=True)
+
+    config.STORE[task_store].copy_channels(
+        with_tag=temp_tag,
+        to_store=config.STORE[to_store]
+    )
+    tmp_task = {'store': task_store, 'all_stores': 'yes', 'tag': temp_tag}
+    play_command_clear_tag(tmp_task, quiet=True)
+
+    print(f"selected and copied {count} channels.")
+    return True
+
+
+def play_command_select_move(task):
+    """Play command select and move.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    temp_tag = 'select_copy_tmp'
+    task_store = task['store']
+    to_store = task['to_store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    if to_store not in config.STORE:
+        config.STORE[to_store] = ProbeInfoList()
+    count = config.STORE[task_store].select(
+        with_tag=task['with_tag'],
+        without_tag=task['without_tag'],
+        tvg_group_title=task['group_title'],
+        tvg_name=task['name'],
+        tvg_id=task['id'],
+        tvg_source=task['source'],
+        set_tag=temp_tag, quiet=True)
+
+    config.STORE[task_store].copy_channels(
+        with_tag=temp_tag,
+        to_store=config.STORE[to_store]
+    )
+    config.STORE[task_store].delete_channels(
+        with_tag=temp_tag
+    )
+    tmp_task = {'store': task_store, 'all_stores': 'yes', 'tag': temp_tag}
+    play_command_clear_tag(tmp_task, quiet=True)
+
+    print(f"selected and moved {count} channels.")
     return True
 
 
@@ -467,13 +582,17 @@ funcdict = {
         "help": "copy channels to other store (create store if not exists)."
     },
     "move_channels": {
-        "join": [
-            {"task": "copy_channels"},
-            {"task": "delete_channels"},
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+            {"name": "with_id", "default": ""},
+            {"name": "with_name", "default": ""},
+            {"name": "to_store", "default": ""},
         ],
-        "help": "move channels to other store.",
-        "hidden": True,
-        "loop": "channels."
+        "func": play_command_move_channels,
+        "loop": "channels",
+        "help": "move channels to other store (create store if not exists)."
     },
     "list_channels": {
         "args": [
@@ -508,6 +627,34 @@ funcdict = {
         ],
         "func": play_command_select,
         "help": "select channels."
+    },
+    "select_and_copy": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+            {"name": "group_title", "default": ""},
+            {"name": "name", "default": ""},
+            {"name": "id", "default": ""},
+            {"name": "source", "default": ""},
+            {"name": "to_store", "default": ""},
+        ],
+        "func": play_command_select_copy,
+        "help": "select and copy channels."
+    },
+    "select_and_move": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+            {"name": "group_title", "default": ""},
+            {"name": "name", "default": ""},
+            {"name": "id", "default": ""},
+            {"name": "source", "default": ""},
+            {"name": "to_store", "default": ""},
+        ],
+        "func": play_command_select_move,
+        "help": "select and move channels."
     }
 }
 
