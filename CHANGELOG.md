@@ -7,7 +7,6 @@ fhs-iptv-tools
 Shortlist to come:
 ------------------
 
-- sort
 - download m3u file from url
 - and lots more (just request on github)
 
@@ -19,3 +18,4 @@ Shortlist to come:
 - 0.8.4: add copy_channels to copy channels and list_stores to list current stores.
 - 0.8.5: fix missing dependancy (pyyaml), add clear tag and change add copy of dataclass struct on copy_channel function
 - 0.8.6: add move, select_and_copy, select_and_move options
+- 0.8.7: add sorted options and add cleanup of save_tasks command.

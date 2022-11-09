@@ -5,9 +5,43 @@ import cmd2
 import os
 import yaml
 from pathlib import Path
+from pprint import pprint
 
 from .playyaml_lib import play_task
 from .__version__ import __app_name__,__version__
+
+
+def clean_task(task, orig_func):
+    """Clean task.
+
+    Args:
+        task: dict with all the tasks.
+        orig_func: default functions.
+
+    Returns:
+        cleaned taskdict
+    """
+    for arg in orig_func['args']:
+        if arg['name'] in task:
+            if task[arg['name']] == arg.get('default', '_____unknown_____'):
+                del task[arg['name']]
+    return task
+
+
+def clean_tasks(taskdict, funcdict):
+    """Clean tasks.
+
+    Args:
+        taskdict: dict with all the tasks.
+        funcdict: default functions.
+
+    Returns:
+        cleaned taskdict
+    """
+    for t in taskdict:
+        my_orig_func = funcdict[t['command']]
+        clean_task(t, my_orig_func)
+    return taskdict
 
 
 def save_tasks(filename, taskdict, funcdict):
@@ -18,6 +52,8 @@ def save_tasks(filename, taskdict, funcdict):
         taskdict: save dict to task
         funcdict: funcdict we are going to use to remove the default args from tasks
     """
+    taskdict = clean_tasks(taskdict, funcdict)
+
     with Path(filename).open("w") as target:
         yaml.dump({'tasks': taskdict}, target)
 
@@ -61,6 +97,7 @@ def create_cmd2_class_str(my_dict):
 
         @cmd2.with_argparser(save_tasks_parser)
         def do_save_tasks(self, args):
+            \"\"\"Save tasks file to disk, to reuse.\"\"\"
             save_tasks(args.file, self.__tasks, self.__funcdict)
 
 
@@ -73,6 +110,7 @@ def create_cmd2_class_str(my_dict):
         #
         @cmd2.with_argparser({{ key }}_parser)
         def do_{{ key }}(self, args):
+            \"\"\"{{ my_func['help'] }}.\"\"\"
             task = {
                 'command': '{{ key }}',
                 {% for item in my_func['args'] -%}

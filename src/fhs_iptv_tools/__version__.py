@@ -1,6 +1,6 @@
 """fhs_iptv_tools - foxhunt software iptv tools, making iptv easier versions """
 
-__version__ = "0.8.6"
+__version__ = "0.8.7"
 __author__ = "Richard de Vos <rdevos72@gmail.com>"
 __author_name__ = "Richard de Vos"
 __author_email__ = "rdevos72@gmail.com"

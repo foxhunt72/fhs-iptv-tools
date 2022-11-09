@@ -155,6 +155,31 @@ def play_command_list_channels(task):
     return True
 
 
+def play_command_sort_channels(task):
+    """Play command sort channels.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_store = task['store']
+    if task_store not in config.STORE:
+        config.STORE[task_store] = ProbeInfoList()
+    result = config.STORE[task_store].sort_channels(
+        sort_key1=task['sort_key1'],
+        sort_key2=task['sort_key2']
+    )
+    if result:
+        print("sorted channels.")
+    else:
+        print("ERROR: sorted channels failed.")
+    return True
+
+
 def play_command_modify_channels(task):
     """Play command modify channels.
 
@@ -602,6 +627,15 @@ funcdict = {
         ],
         "func": play_command_list_channels,
         "help": "list channels."
+    },
+    "sort_channels": {
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "sort_key1", "default": ""},
+            {"name": "sort_key2", "default": ""},
+        ],
+        "func": play_command_sort_channels,
+        "help": "sort channels."
     },
     "save_m3u": {
         "args": [

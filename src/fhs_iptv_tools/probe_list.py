@@ -419,4 +419,34 @@ class ProbeInfoList:
             print(f"copied {ch.tvg_name}")
         return count
 
+    def sort_channels(self, *, sort_key1="", sort_key2=""):
+        """Sort channels.
 
+        Args:
+            sort_key1: first key to sort on
+            sort_key2: second key to sort on
+
+        Returns:
+            result: boolean
+        """
+        if self.__m3u_channels == []:
+            return True
+        try:
+            getattr(self.__m3u_channels[0], sort_key1)
+        except AttributeError as e:
+            print(f"ERROR: sortkey 1 not found: {e}")
+            return False
+
+        if sort_key2 == "":
+            sort_key2 = sort_key1
+        try:
+            getattr(self.__m3u_channels[0], sort_key2)
+        except AttributeError as e:
+            print(f"ERROR: sortkey 2 not found: {e}")
+            return False
+
+        def sorted_key(m3u_info):
+            return (getattr(m3u_info, sort_key1), getattr(m3u_info, sort_key2))
+
+        self.__m3u_channels.sort(key=sorted_key)
+        return True
