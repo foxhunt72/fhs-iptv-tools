@@ -18,7 +18,7 @@ Iptv Tools Version: 0.8.7
 - [Author](#author)
 
 <br>
-##Main features
+## Main features
 - load any m3u
 - remove unused channels
 - join multipe m3u files
@@ -28,7 +28,7 @@ Iptv Tools Version: 0.8.7
 - do this all interactive
 - or run this all automatic with a yaml 
 
-##Future features
+## Future features
 - select on codec / bitrate / resolution
 - clean probe/scan check
 - clean interactive history file (max lines)
@@ -40,7 +40,7 @@ Thanks to:
 For inspiration and some code
 -   <https://github.com/cmcconomy/iptv-filter.git>
 
-##Usage
+## Usage
 -----
 
 ```shellscript
@@ -103,7 +103,7 @@ For inspiration and some code
 
 ```
 
-##Installation
+## Installation
 ------------
 
 ``` {.bash}
@@ -125,15 +125,15 @@ pip3 install fhs_iptv_tools
 - jinja2
 - appdirs
 
-##Compatibility
+## Compatibility
 -------------
 
-##Licence
+## Licence
 -------
 
 MIT license
 
-##Author
+## Author
 -------
 
 Richard de Vos
