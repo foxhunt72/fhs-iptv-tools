@@ -1,27 +1,44 @@
 fhs\_iptv\_tools
 ================
 
-Version:
+Iptv Tools Version: 0.8.7
 --------
+#### ** For changes see** [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
+<br>
+##Foxhunt Software IPTV Tools, making iptv easier
+<br>
+## Index
+- [Main features](#main-features)
+- [Future features](#future-features)
+- [Usage](#usage)
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [License](#license)
+- [Author](#author)
+<br>
+##Main features
+- load any m3u
+- remove unused channels
+- join multipe m3u files
+- edit channels
+- scan/probe streams/channels (get resolution, codec and bitrate for channels
+- save new m3u file
+- do this all interactive
+- or run this all automatic with a yaml 
 
-0.8.7
-For changes see [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
+##Future features
+- select on codec / bitrate / resolution
+- clean probe/scan check
+- clean interactive history file (max lines)
 
-foxhunt software iptv tools, making iptv easier
-
-Initial version, docs need to go, for now
-
--   load m3u file
--   probe stream sources
--   run tasks from script
--   use interactive mode
 
 Thanks to:
 ----------
 
+For inspiration and some code
 -   <https://github.com/cmcconomy/iptv-filter.git>
 
-Usage
+##Usage
 -----
 
 ```shellscript
@@ -43,6 +60,12 @@ Usage
  # delete all the channels we didn't tag with the select command.
  (fhs_iptv_tools) delete_channels --without_tag keep
  removed 15 channels.
+
+ # sort all channels
+ sort_channels --sort_key1 tvg_group_title --sort_key2 tvg_name
+
+ # probe channels
+ probe_scan
 
  # and save to m3u file, the the delete is not realy needed you can also use --with_tag keep in the save action.
  (fhs_iptv_tools) save_m3u --file m3u.new
@@ -78,7 +101,7 @@ Usage
 
 ```
 
-Installation
+##Installation
 ------------
 
 ``` {.bash}
@@ -93,22 +116,22 @@ pip3 install fhs_iptv_tools
 # install ffprobe
 ```
 
-### Requirements
+##Requirements
 
 - typer[all]
 - cmd2
 - jinja2
 - appdirs
 
-Compatibility
+##Compatibility
 -------------
 
-Licence
+##Licence
 -------
 
 MIT license
 
-Authors
+##Author
 -------
 
 Richard de Vos
