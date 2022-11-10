@@ -5,8 +5,10 @@ Iptv Tools Version: 0.8.7
 --------
 #### ** For changes see** [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
 <br>
-## Foxhunt Software IPTV Tools, making iptv easier
-<br>
+## Foxhunt Software IPTV Toolsi
+
+Making iptv easier
+
 ## Index
 
 - [Main features](#main-features)
@@ -17,8 +19,8 @@ Iptv Tools Version: 0.8.7
 - [License](#license)
 - [Author](#author)
 
-<br>
 ## Main features
+
 - load any m3u
 - remove unused channels
 - join multipe m3u files
@@ -29,6 +31,7 @@ Iptv Tools Version: 0.8.7
 - or run this all automatic with a yaml 
 
 ## Future features
+
 - select on codec / bitrate / resolution
 - clean probe/scan check
 - clean interactive history file (max lines)
