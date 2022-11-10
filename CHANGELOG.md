@@ -19,3 +19,4 @@ Shortlist to come:
 - 0.8.5: fix missing dependancy (pyyaml), add clear tag and change add copy of dataclass struct on copy_channel function
 - 0.8.6: add move, select_and_copy, select_and_move options
 - 0.8.7: add sorted options and add cleanup of save_tasks command.
+- 0.8.8: change documentation

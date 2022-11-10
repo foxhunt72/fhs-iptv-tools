@@ -1,11 +1,11 @@
 fhs\_iptv\_tools
 ================
 
-Iptv Tools Version: 0.8.7
+Iptv Tools Version: 0.8.8
 --------
 #### ** For changes see** [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
 
-## Foxhunt Software IPTV Toolsi
+## Foxhunt Software IPTV Tools
 
 Making iptv easier
 
