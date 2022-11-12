@@ -162,8 +162,8 @@ class ProbeInfo:
         try:
             bitrate = int(((total_size * 8) / total_time))
         except ZeroDivisionError:
-            return "unknown"
-        return f"{bitrate} calculated"
+            return -1
+        return bitrate
 
     def swap_video_and_audio_in_list(self, result):
         """Reverse list is list consist of audio / video and not video / auto.
@@ -180,7 +180,7 @@ class ProbeInfo:
             result.reverse()
         return result
 
-    def info2str(self, media_info):
+    def info2str_and_dict(self, media_info):
         """Convert media info to info str.
 
         Args:
@@ -190,15 +190,22 @@ class ProbeInfo:
             media_str
         """
         result = []
+        dict_result = {}
         for idx, p in enumerate(media_info['streams']):
             codec_type = p.get('codec_type', 'unknown')
             if 'bit_rate' in p:
                 bit_rate = p['bit_rate']
             else:
                 bit_rate = self.calculate_bitrate(media_info, idx)
+            dict_result[codec_type]={
+                'codec': p.get('codec_name','codec unknown'),
+                'bit_rate': int(bit_rate)
+            }
             if codec_type == 'video':
                 result.append(f"video: {p.get('codec_name','codec unknown')} bit_rate: {bit_rate} / width: {p.get('width', 'unknown')} / height: {p.get('height', 'unknown')}")  # noqa: E501
+                dict_result[codec_type]['with'] = int(p.get('width', -1))
+                dict_result[codec_type]['height'] = int(p.get('height', -1))
             if codec_type == 'audio':
                 result.append(f"audio: {p.get('codec_name','codec unknown')} bit_rate: {bit_rate}")  # noqa: E501
         result = self.swap_video_and_audio_in_list(result)
-        return ", ".join(result)
+        return (", ".join(result), dict_result)

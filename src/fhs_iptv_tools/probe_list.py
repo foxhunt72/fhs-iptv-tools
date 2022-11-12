@@ -5,6 +5,7 @@ from .import_m3u import import_m3u_file, return_tvg_group_titles, M3uChannel
 from enum import Enum
 import time
 import copy
+from pprint import pprint
 
 
 class LoadType(Enum):
@@ -70,41 +71,61 @@ class ProbeInfoList:
         self.__m3u_channels = result
         return self.__m3u_channels
 
-    def probe_scan(self, delay=5, status_output=None):
+    def probe_channel(self, *, channel, status_output, max_len=40, delay=5):
+        """Probe a channel.
+
+        Args:
+            channel: channel array
+            status_output: function to output status
+            max_len: max len for tvg_name
+            delay: sleep delay after scan
+        """
+        if status_output is not None:
+            status_output(f"starting scanning: {channel.tvg_name}")
+        if type(channel.tvg_sources) == list:
+            for source in channel.tvg_sources:
+                result = self.__probe.probe_with_cache(source)
+        else:
+            result = self.__probe.probe_with_cache(channel.tvg_sources)
+        if result is None:
+            if status_output is not None:
+                status_output(f"no result for: {channel.tvg_name}")
+            return
+
+        if status_output is not None:
+            status_output(f"ready scanning: {channel.tvg_name}")
+        (channel.fhs_info, channel.fhs_dict) = self.__probe.info2str_and_dict(result)
+        print(f"{channel.tvg_name:{max_len}}:\t{channel.fhs_info}")
+        if result.get('fhs_source', 'unknown') != 'cache':
+            time.sleep(delay)
+        return
+
+
+
+    def probe_scan(self, *, delay=5, status_output=None, with_tag="", without_tag="", with_id="", with_name=""):
         """Probe a m3u file.
 
-        Args: 
+        Args:
             delay: delay between channels.
             status_output: function to output status
+            with_tag: select on tag set
+            without_tag: select on tag not set
+            with_id: change only on id
+            with_name: change only when name is the same
 
         Returns:
             Status: None
         """
         max_len = 10
-        for ch in self.__m3u_channels:
+        channels = list(self.get_channels(
+            with_tag=with_tag, without_tag=without_tag, with_id=with_id, with_name=with_name))
+        print(f"channels: {len(channels)}")
+        for ch in channels:
             if len(ch.tvg_name) > max_len:
                 max_len = len(ch.tvg_name)
         max_len += 3
-        for ch in self.__m3u_channels:
-            if status_output is not None:
-                status_output(f"starting scanning: {ch.tvg_name}")
-            if type(ch.tvg_sources) == list:
-                for source in ch.tvg_sources:
-                    result = self.__probe.probe_with_cache(source)
-            else:
-                result = self.__probe.probe_with_cache(ch.tvg_sources)
-            if result is None:
-                if status_output is not None:
-                    status_output(f"no result for: {ch.tvg_name}")
-                continue
-
-            if status_output is not None:
-                status_output(f"ready scanning: {ch.tvg_name}")
-            ch.fhs_info = self.__probe.info2str(result)
-            print(f"{ch.tvg_name:{max_len}}:\t{ch.fhs_info}")
-            if result.get('fhs_source', 'unknown') != 'cache':
-                time.sleep(delay)
-
+        for ch in channels:
+            self.probe_channel(channel=ch, status_output=status_output, max_len=max_len, delay=delay)
         return None
 
     def count_channels(self):
@@ -326,7 +347,7 @@ class ProbeInfoList:
             display_tags = ""
         return f"<{channel.tvg_id}> {channel.tvg_name}   /   {channel.tvg_group_title}{display_tags}"
 
-    def list_channels(self, *, with_tag="", without_tag=""):
+    def list_channels(self, *, with_tag="", without_tag="", verbose="no"):
         """List channels.
 
         List channels
@@ -334,6 +355,7 @@ class ProbeInfoList:
         Args:
             with_tag: select on tag set
             without_tag: select on tag not set
+            verbose: verbose output no or yes
 
         Returns:
             yield of channels
@@ -343,6 +365,8 @@ class ProbeInfoList:
         for ch in self.get_channels(with_tag=with_tag, without_tag=without_tag):
             count += 1
             print(f"{count}: {self.display_channel(ch)}")
+            if verbose == 'yes':
+                pprint(ch)
         return count
 
     def save_m3u_file(self, *, file, with_tag="", without_tag=""):

@@ -1,7 +1,7 @@
 fhs\_iptv\_tools
 ================
 
-Iptv Tools Version: 0.8.8
+Iptv Tools Version: 0.8.9
 --------
 #### ** For changes see** [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
 

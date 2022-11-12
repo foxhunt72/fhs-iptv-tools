@@ -102,6 +102,8 @@ pytest-failure:
 bumppatch:
   #!/usr/bin/env sh
   bumpversion --allow-dirty --verbose patch
+  # bumpversion --allow-dirty --verbose --new-version 1.0.0
+  # bumpversion --allow-dirty --verbose major
 
 # edit README.rst
 readme:

@@ -6,6 +6,27 @@ from . import config
 from .playyaml_lib import func_dict_parse, play as play_lib
 
 
+def play_command_run_tasks(task):
+    """Play command load_m3u_file.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    from .probe_list import ProbeInfoList
+
+    task_file = task["file"]
+    include_tag = task['include_tag']
+    if include_tag == "":
+        include_tag = None
+    exclude_tag = task['exclude_tag']
+    if exclude_tag == "":
+        exclude_tag = None
+    play(task_file, include_tag, exclude_tag)
+    return True
+
 def play_command_load_m3u_file(task):
     """Play command load_m3u_file.
 
@@ -150,7 +171,7 @@ def play_command_list_channels(task):
     task_store = task['store']
     if task_store not in config.STORE:
         config.STORE[task_store] = ProbeInfoList()
-    count = config.STORE[task_store].list_channels(with_tag=task['with_tag'], without_tag=task['without_tag'])
+    count = config.STORE[task_store].list_channels(with_tag=task['with_tag'], without_tag=task['without_tag'], verbose=task['verbose'])
     print(f"list {count} channels.")
     return True
 
@@ -174,7 +195,7 @@ def play_command_sort_channels(task):
         sort_key2=task['sort_key2']
     )
     if result:
-        print("sorted channels.")
+        print(f"sorted channels with key1: {task['sort_key1']}, key2: {task['sort_key2']}.")
     else:
         print("ERROR: sorted channels failed.")
     return True
@@ -413,7 +434,13 @@ def play_command_probe_scan(task):
     if task_store not in config.STORE:
         config.STORE[task_store] = ProbeInfoList()
     with config.CONSOLE.status(f"Probe scan channel list from store: {task_store} with delay {delay}", spinner="dots"):
-        config.STORE[task_store].probe_scan(delay)
+        config.STORE[task_store].probe_scan(
+            with_tag=task['with_tag'],
+            without_tag=task['without_tag'],
+            with_id=task['with_id'],
+            with_name=task['with_name'],
+            delay=delay
+        )
     return True
 
 
@@ -504,6 +531,15 @@ def play_command_filter_channels(task):
 
 
 funcdict = {
+    "run_tasks": {
+        "args": [
+            {"name": "file"},
+            {"name": "include_tag", "default": ""},
+            {"name": "exclude_tag", "default": ""}
+        ],
+        "func": play_command_run_tasks,
+        "help": "run tasks from yaml task file."
+    },
     "load_m3u": {
         "args": [{"name": "file"}, {"name": "store", "help": "store name", "default": "default"}],
         "func": play_command_load_m3u_file,
@@ -535,7 +571,14 @@ funcdict = {
         "help": "list channels for a group."
     },
     "probe_scan": {
-        "args": [{"name": "store", "help": "store name", "default": "default"},{"name": "delay", "help": "delay between probing channels", "default": "5"}],
+        "args": [
+            {"name": "store", "help": "store name", "default": "default"},
+            {"name": "delay", "help": "delay between probing channels", "default": "5"},
+            {"name": "with_tag", "default": ""},
+            {"name": "without_tag", "default": ""},
+            {"name": "with_id", "default": ""},
+            {"name": "with_name", "default": ""}
+        ],
         "func": play_command_probe_scan,
         "help": "probe scanning the list of channels."
     },
@@ -600,7 +643,7 @@ funcdict = {
             {"name": "without_tag", "default": ""},
             {"name": "with_id", "default": ""},
             {"name": "with_name", "default": ""},
-            {"name": "to_store", "default": ""},
+            {"name": "to_store"},
         ],
         "func": play_command_copy_channels,
         "loop": "channels",
@@ -613,7 +656,7 @@ funcdict = {
             {"name": "without_tag", "default": ""},
             {"name": "with_id", "default": ""},
             {"name": "with_name", "default": ""},
-            {"name": "to_store", "default": ""},
+            {"name": "to_store"},
         ],
         "func": play_command_move_channels,
         "loop": "channels",
@@ -624,6 +667,7 @@ funcdict = {
             {"name": "store", "help": "store name", "default": "default"},
             {"name": "with_tag", "default": ""},
             {"name": "without_tag", "default": ""},
+            {"name": "verbose", "default": "no", "help": "verbose: no or yes"},
         ],
         "func": play_command_list_channels,
         "help": "list channels."
@@ -631,8 +675,8 @@ funcdict = {
     "sort_channels": {
         "args": [
             {"name": "store", "help": "store name", "default": "default"},
-            {"name": "sort_key1", "default": ""},
-            {"name": "sort_key2", "default": ""},
+            {"name": "sort_key1", "default": "tvg_group_title", 'help': "sort key 1: tvg_id, tvg_name, tvg_logo, tvg_group_title"},
+            {"name": "sort_key2", "default": "tvg_name", 'help': "sort key 2: tvg_id, tvg_name, tvg_logo, tvg_group_title"},
         ],
         "func": play_command_sort_channels,
         "help": "sort channels."
@@ -671,7 +715,7 @@ funcdict = {
             {"name": "name", "default": ""},
             {"name": "id", "default": ""},
             {"name": "source", "default": ""},
-            {"name": "to_store", "default": ""},
+            {"name": "to_store"},
         ],
         "func": play_command_select_copy,
         "help": "select and copy channels."
@@ -685,7 +729,7 @@ funcdict = {
             {"name": "name", "default": ""},
             {"name": "id", "default": ""},
             {"name": "source", "default": ""},
-            {"name": "to_store", "default": ""},
+            {"name": "to_store"},
         ],
         "func": play_command_select_move,
         "help": "select and move channels."
