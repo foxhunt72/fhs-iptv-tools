@@ -132,6 +132,31 @@ def loop_play_task(command_dict, task, *, include_tags=None, exclude_tags=None, 
     return True
 
 
+def play_loop(task):
+    """Play command load_m3u_file.
+
+    Args:
+        task: task array
+
+    Returns:
+        Good: boolean
+    """
+    import copy
+    with_items = task["with_items"]
+    funcdict = task["funcdict"]
+    for i in with_items:
+        tasks = copy.deepcopy(task["tasks"])
+        if type(i) == str:
+            print(i)
+            for loop_task in tasks:
+                for key in loop_task:
+                    if loop_task[key] == "__ITEM__":
+                        loop_task[key] = i
+                play_task(loop_task, funcdict=funcdict)
+            pprint(tasks)
+    return True
+
+
 def play_task(task, *, include_tags=None, exclude_tags=None, funcdict):
     """Play a task.
 
@@ -155,6 +180,9 @@ def play_task(task, *, include_tags=None, exclude_tags=None, funcdict):
     if "command" not in task:
         sys.stderr.write(f"missing command entry in task {str(task)}")
         exit(3)
+
+    if task["command"] == "loop":
+        task["funcdict"] = funcdict
 
     command_dict = funcdict.get(task["command"], None)
     if command_dict is None:
@@ -219,4 +247,12 @@ def func_dict_parse(funcdict, for_type=None):
         if for_type == 'interactive' and cur_func.get('interactive_hidden', False) is True:
             continue
         new_funcdict[p] = cur_func
+    new_funcdict['loop'] = {
+        "args": [
+            {"name": "with_items"},
+            {"name": "tasks"}
+        ],
+        "func": play_loop,
+        "help": "loop over multiple tasks",
+    }
     return new_funcdict

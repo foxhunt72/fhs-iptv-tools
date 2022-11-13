@@ -1,7 +1,7 @@
 fhs\_iptv\_tools
 ================
 
-Iptv Tools Version: 0.8.9
+Iptv Tools Version: 0.8.10
 --------
 #### ** For changes see** [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
 
@@ -14,6 +14,7 @@ Making iptv easier
 - [Main features](#main-features)
 - [Future features](#future-features)
 - [Usage](#usage)
+- [Examples](#examples)
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [License](#license)
@@ -130,6 +131,11 @@ pip3 install fhs_iptv_tools
 
 ## Compatibility
 -------------
+
+## Examples
+-----------
+
+- [loop.tasks](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/Examples/loop.tasks).
 
 ## Licence
 -------

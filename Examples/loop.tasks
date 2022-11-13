@@ -1,0 +1,24 @@
+# example of using loop over multiple tasks
+#
+# this scripts first load a iptv.m3u.list and
+# then copy items to new store, where __ITEM__ is changed to the variable loop.
+#
+# run it with
+# 
+# fhs-iptv-tools run-tasks --yaml-command loop.tasks
+#
+tasks:
+- command: load_m3u
+  file: iptv.m3u.list
+- command: filter_channels
+  type: channels
+- command: loop
+  tasks:
+  - command: select_and_copy
+    name: __ITEM__
+    to_store: richard
+  - command: probe_scan
+    store: richard
+  with_items:
+  - SBS
+  - RTL
