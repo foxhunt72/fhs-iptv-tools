@@ -22,3 +22,4 @@ Shortlist to come:
 - 0.8.8: change documentation
 - 0.8.9: some small changes and add a run_tasks command, to load and use a task file from interactive mode, changed some default values
 - 0.8.10: add loop function for tasks with example.
+- 0.8.11: add docker

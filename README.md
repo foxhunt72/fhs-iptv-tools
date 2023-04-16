@@ -1,7 +1,7 @@
 fhs\_iptv\_tools
 ================
 
-Iptv Tools Version: 0.8.10
+Iptv Tools Version: 0.8.11
 --------
 #### ** For changes see** [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
 
@@ -48,6 +48,10 @@ For inspiration and some code
 -----
 
 ```shellscript
+
+ # use it with docker like this
+ docker run --rm -h fhs-iptv-tools -t -i rdevos72/fhs-iptv-tools --help
+
  fhs-iptv-tools interactive
 
  # load m3u file from disk

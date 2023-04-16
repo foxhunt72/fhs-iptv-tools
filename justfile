@@ -9,6 +9,7 @@ default:
 setuptest directory="/tmp/venv":
   #!/usr/bin/env sh
   python -m venv "{{directory}}"
+  "{{directory}}/bin/python" -m pip install --upgrade pip
   "{{directory}}/bin/pip3" install -e .
   echo "use: source {{directory}}/bin/active to test with python"
 
@@ -16,9 +17,12 @@ setuptest directory="/tmp/venv":
 setuptest-dev directory="/tmp/venv":
   #!/usr/bin/env sh
   python -m venv "{{directory}}"
+  "{{directory}}/bin/python" -m pip install --upgrade pip
   "{{directory}}/bin/pip3" install -e .
   "{{directory}}/bin/pip3" install -r requirements-dev.txt
-  "{{directory}}/bin/pip3" install -r requirements-flake8.txt
+  #  deze gaat fout dus dan maar even zo
+  #  "{{directory}}/bin/pip3" install -r requirements-flake8.txt
+  cat requirements-flake8.txt| tr -s "\n" | xargs -n 1 -d "\n" {{directory}}/bin/pip3 install
   echo "use: source {{directory}}/bin/active to test with python"
 
 githook-tox:
@@ -92,8 +96,9 @@ publish:
   export PKG_NAME="$(python setup.py --name)"
   export PKG_VERSION="$(python setup.py --version)"
   export PKG_FILE="dist/${PKG_NAME}-${PKG_VERSION}.tar.gz"
-  twine upload -r pypi "$PKG_FILE" && gh release create "v${PKG_VERSION}" "$PKG_FILE" -F CHANGELOG.md
+  twine upload -r pypi "$PKG_FILE" && gh release create "v${PKG_VERSION}" "$PKG_FILE" -F CHANGELOG.md && tweet-fhs-iptv-tools.sh "$PKG_VERSION"
   # twine upload dist/*
+  docker buildx build --platform linux/arm64,linux/amd64 --tag rdevos72/fhs-iptv-tools:latest --tag rdevos72/fhs-iptv-tools:$PKG_VERSION --push .
 
 pytest-failure:
   tox -e py310 -- --lf --trace
