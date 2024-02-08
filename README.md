@@ -1,7 +1,7 @@
 fhs\_iptv\_tools
 ================
 
-Iptv Tools Version: 0.8.12
+Iptv Tools Version: 0.8.13
 --------
 #### ** For changes see** [changelog](https://github.com/foxhunt72/fhs-iptv-tools/blob/main/CHANGELOG.md).
 
@@ -16,6 +16,7 @@ Making iptv easier
 - [Usage](#usage)
 - [Examples](#examples)
 - [Installation](#installation)
+- [Docker](#docker)
 - [Requirements](#requirements)
 - [License](#license)
 - [Author](#author)
@@ -133,6 +134,18 @@ pip3 install fhs_iptv_tools
 - jinja2
 - appdirs
 
+## Docker
+
+Add docker image and automatically builds
+
+See https://hub.docker.com/r/rdevos72/fhs-iptv-tools
+
+```
+docker run --rm -v /tmp/files:/opt/files -ti rdevos72/fhs-iptv-tools --help
+```
+
+
+------------
 ## Compatibility
 -------------
 
