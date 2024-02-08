@@ -98,7 +98,7 @@ publish:
   export PKG_FILE="dist/${PKG_NAME}-${PKG_VERSION}.tar.gz"
   twine upload -r pypi "$PKG_FILE" && gh release create "v${PKG_VERSION}" "$PKG_FILE" -F CHANGELOG.md && tweet-fhs-iptv-tools.sh "$PKG_VERSION"
   # twine upload dist/*
-  docker buildx build --platform linux/arm64,linux/amd64 --tag rdevos72/fhs-iptv-tools:latest --tag rdevos72/fhs-iptv-tools:$PKG_VERSION --push .
+  #docker buildx build --platform linux/arm64,linux/amd64 --tag rdevos72/fhs-iptv-tools:latest --tag rdevos72/fhs-iptv-tools:$PKG_VERSION --push .
 
 pytest-failure:
   tox -e py310 -- --lf --trace
