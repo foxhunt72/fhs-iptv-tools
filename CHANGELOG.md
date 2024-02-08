@@ -24,3 +24,4 @@ Shortlist to come:
 - 0.8.10: add loop function for tasks with example.
 - 0.8.11: add docker
 - 0.8.12: change dockerfile with other user
+- 0.8.13: add docker info
